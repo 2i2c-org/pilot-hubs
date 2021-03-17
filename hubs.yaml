@@ -15,6 +15,12 @@ clusters:
         template: base-hub
         auth0:
           connection: github
+          extra_allowed_users: &paleohack_users
+            - CommonClimate
+            - khider
+            - fzhu2e
+            - alexkjames
+          extra_admins: *paleohack_users
         config:
           jupyterhub:
             scheduling:
@@ -50,18 +56,6 @@ clusters:
               image:
                 name: quay.io/2i2c/paleohack-2021
                 tag: d8c26cd01c8a
-            hub:
-              config:
-                Authenticator:
-                  allowed_users: &paleohack_users
-                    - yuvipanda
-                    - choldgraf
-                    - GeorgianaElena
-                    - CommonClimate
-                    - khider
-                    - fzhu2e
-                    - alexkjames
-                  admin_users: *paleohack_users
   - name: 2i2c
     image_repo:  "us-central1-docker.pkg.dev/two-eye-two-see/low-touch-hubs/base-user"
     provider: gcp
@@ -101,15 +95,6 @@ clusters:
                 funded_by:
                   name: 2i2c
                   url: https://2i2c.org
-            hub:
-              config:
-                Authenticator:
-                  allowed_users: &staging_users
-                    - yuvipanda@gmail.com
-                    - colliand@gmail.com
-                    - choldgraf@gmail.com
-                    - georgiana.dolocan@gmail.com
-                  admin_users: *staging_users
       - name: dask-staging
         cluster: 2i2c
         domain: dask-staging.pilot.2i2c.cloud
@@ -141,15 +126,6 @@ clusters:
                 image:
                   name: pangeo/pangeo-notebook
                   tag: 2021.02.19
-              hub:
-                config:
-                  Authenticator:
-                    allowed_users: &dask_staging_users
-                      - yuvipanda@gmail.com
-                      - colliand@gmail.com
-                      - choldgraf@gmail.com
-                      - georgiana.dolocan@gmail.com
-                    admin_users: *dask_staging_users
       - name: ephemeral
         cluster: 2i2c
         domain: ephemeral.pilot.2i2c.cloud
