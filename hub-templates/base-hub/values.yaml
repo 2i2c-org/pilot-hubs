@@ -82,6 +82,8 @@ jupyterhub:
     admin:
       extraVolumeMounts:
       - name: home
+        mountPath: /home/jovyan/admin/user-homes
+      - name: home
         mountPath: /home/jovyan/shared-readwrite
         subPath: _shared
     startTimeout: 600 # 10 mins, because sometimes we have too many new nodes coming up together
