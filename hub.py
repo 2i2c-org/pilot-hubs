@@ -242,12 +242,31 @@ class Hub:
 
             # Add 2i2c staff to the list of admins and allowed users
             admin_users, allowed_users = self.get_hub_allowed_users()
-            generated_config['jupyterhub']['hub']['config']['Authenticator'] = {
-                'admin_users': admin_users,
-                'allowed_users': allowed_users
-            }
+
+            # Don't set allowed_users if hub uses username_pattern
+            if self.username_pattern_filtering():
+                generated_config['jupyterhub']['hub']['config']['Authenticator'] = {
+                    'admin_users': admin_users,
+                }
+            else:
+                generated_config['jupyterhub']['hub']['config']['Authenticator'] = {
+                    'admin_users': admin_users,
+                    'allowed_users': allowed_users
+                }
 
         return self.apply_hub_template_fixes(generated_config, proxy_secret_key)
+
+
+    def username_pattern_filtering(self):
+        if 'base-hub' in self.spec['config']:
+            if 'username_pattern' in self.spec['config']['base-hub']['jupyterhub']['hub']['config']['Authenticator']:
+                return True
+        else:
+            if 'username_pattern' in self.spec['config']['jupyterhub']['hub']['config']['Authenticator']:
+                return True
+
+        return False
+
 
     def get_hub_allowed_users(self):
         # Add 2i2c staff as admins and allowed users
