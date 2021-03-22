@@ -1,3 +1,13 @@
+staff:
+  google:
+    - yuvipanda@gmail.com
+    - colliand@gmail.com
+    - choldgraf@gmail.com
+    - georgiana.dolocan@gmail.com
+  github:
+    - yuvipanda
+    - choldgraf
+    - GeorgianaElena
 clusters:
   - name: hackathon-alpha
     provider: gcp

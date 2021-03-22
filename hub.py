@@ -8,6 +8,7 @@ import json
 import pytest
 import random
 import tempfile
+from pathlib import Path
 from ruamel.yaml import YAML
 from ruamel.yaml.scanner import ScannerError
 from textwrap import dedent
@@ -250,17 +251,13 @@ class Hub:
 
     def get_hub_allowed_users(self):
         # Add 2i2c staff as admins and allowed users
-        staff_emails = [
-            'yuvipanda@gmail.com',
-            'colliand@gmail.com',
-            'choldgraf@gmail.com',
-            'georgiana.dolocan@gmail.com'
-        ]
-        staff_github_ids = [
-            'yuvipanda',
-            'choldgraf',
-            'GeorgianaElena'
-        ]
+        with open(Path(__file__).parent / "hubs.yaml") as f:
+            config = yaml.load(f)
+
+        staff_emails = config['staff']['google']
+
+        staff_github_ids = config['staff']['github']
+
 
         extra_admins = self.spec['auth0']['extra_admins'] if self.spec['auth0'].get('extra_admins', False) else []
         extra_allowed_users = self.spec['auth0']['extra_allowed_users'] if self.spec['auth0'].get('extra_allowed_users', False) else []
