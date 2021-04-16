@@ -8,6 +8,7 @@ import json
 import pytest
 import random
 import tempfile
+from pathlib import Path
 from ruamel.yaml import YAML
 from ruamel.yaml.scanner import ScannerError
 from textwrap import dedent
@@ -239,8 +240,52 @@ class Hub:
             # these can all exist fine.
             generated_config['jupyterhub']['hub']['config']['GenericOAuthenticator'] = auth_provider.get_client_creds(client, self.spec['auth0']['connection'])
 
+            # Add 2i2c staff to the list of admins and allowed users
+            admin_users, allowed_users = self.get_hub_allowed_users()
+
+            # Don't set allowed_users if hub uses username_pattern
+            if self.username_pattern_filtering():
+                generated_config['jupyterhub']['hub']['config']['Authenticator'] = {
+                    'admin_users': admin_users,
+                }
+            else:
+                generated_config['jupyterhub']['hub']['config']['Authenticator'] = {
+                    'admin_users': admin_users,
+                    'allowed_users': allowed_users
+                }
+
         return self.apply_hub_template_fixes(generated_config, proxy_secret_key)
 
+
+    def username_pattern_filtering(self):
+        if 'base-hub' in self.spec['config']:
+            if 'username_pattern' in self.spec['config']['base-hub']['jupyterhub']['hub']['config']['Authenticator']:
+                return True
+        else:
+            if 'username_pattern' in self.spec['config']['jupyterhub']['hub']['config']['Authenticator']:
+                return True
+
+        return False
+
+
+    def get_hub_allowed_users(self):
+        # Add 2i2c staff as admins and allowed users
+        with open(Path(__file__).parent / "hubs.yaml") as f:
+            config = yaml.load(f)
+
+        staff_emails = config['staff']['google']
+
+        staff_github_ids = config['staff']['github']
+
+
+        extra_admins = self.spec['auth0']['extra_admins'] if self.spec['auth0'].get('extra_admins', False) else []
+        extra_allowed_users = self.spec['auth0']['extra_allowed_users'] if self.spec['auth0'].get('extra_allowed_users', False) else []
+
+        if 'google' in self.spec['auth0']['connection']:
+            return staff_emails + extra_admins, staff_emails + extra_allowed_users
+
+        # Right now we only have hubs with either google and github auth connections
+        return staff_github_ids + extra_admins, staff_github_ids + extra_allowed_users
 
     def unset_env_var(self, env_var, old_env_var_value):
         """
