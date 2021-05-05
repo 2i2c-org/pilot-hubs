@@ -56,7 +56,7 @@ def build_image(image_repo):
     """
     Build & push image in images/user if needed
     """
-    tag = last_modified_commit(os.path.join(HERE, "images/user"))
+    tag = last_modified_commit(os.path.join(os.path.dirname(HERE), "images/user"))
     image_name = f"{image_repo}:{tag}"
 
     if image_exists(image_name):
